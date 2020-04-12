@@ -1,24 +1,24 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation} from '@angular/core';
-
-import {CompactType, DisplayGrid, Draggable, GridsterConfig, GridsterItem, GridType, PushDirections, Resizable} from 'angular-gridster2';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
+import {CompactType, DirTypes, DisplayGrid, Draggable, GridsterConfig, GridsterItem, GridType, Resizable} from 'angular-gridster2';
 
 interface Safe extends GridsterConfig {
   draggable: Draggable;
   resizable: Resizable;
-  pushDirections: PushDirections;
 }
 
 @Component({
-  selector: 'app-general',
-  templateUrl: './home.component.html',
+  selector: 'app-rtl',
+  templateUrl: './rtl.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit {
+export class RtlComponent implements OnInit, OnDestroy {
   options: Safe;
   dashboard: Array<GridsterItem>;
 
   ngOnInit() {
+    document.body.setAttribute('dir', 'rtl');
+
     this.options = {
       gridType: GridType.Fit,
       compactType: CompactType.None,
@@ -71,8 +71,23 @@ export class HomeComponent implements OnInit {
       displayGrid: DisplayGrid.Always,
       disableWindowResize: false,
       disableWarnings: false,
-      scrollToNewItems: false
+      scrollToNewItems: false,
+      dirType: DirTypes.RTL
     };
+
+    this.dashboard = [
+      {cols: 2, rows: 1, y: 0, x: 0},
+      {cols: 2, rows: 2, y: 0, x: 2, hasContent: true},
+      {cols: 1, rows: 1, y: 0, x: 4},
+      {cols: 1, rows: 1, y: 2, x: 5},
+      {cols: 1, rows: 1, y: 1, x: 0},
+      {cols: 1, rows: 1, y: 1, x: 0},
+      {cols: 2, rows: 2, y: 3, x: 5, minItemRows: 2, minItemCols: 2, label: 'Min rows & cols = 2'},
+      {cols: 2, rows: 2, y: 2, x: 0, maxItemRows: 2, maxItemCols: 2, label: 'Max rows & cols = 2'},
+      {cols: 2, rows: 1, y: 2, x: 2, dragEnabled: true, resizeEnabled: true, label: 'Drag&Resize Enabled'},
+      {cols: 1, rows: 1, y: 2, x: 4, dragEnabled: false, resizeEnabled: false, label: 'Drag&Resize Disabled'},
+      {cols: 1, rows: 1, y: 2, x: 6}
+    ];
 
     this.dashboard = [
       {cols: 2, rows: 1, y: 0, x: 0},
@@ -103,5 +118,9 @@ export class HomeComponent implements OnInit {
 
   addItem() {
     this.dashboard.push({x: 0, y: 0, cols: 1, rows: 1});
+  }
+
+  ngOnDestroy(): void {
+    document.body.removeAttribute('dir');
   }
 }

@@ -13,16 +13,14 @@
     "strictNullChecks": true,
     "target": "es2015",
     "module": "esnext",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
     "lib": [
       "es2018",
       "dom"
     ],
     "paths": {
       "angular-gridster2": [
-        "dist/angular-gridster2"
+        "dist/angular-gridster2",
+//        "projects/angular-gridster2/src/public_api.ts"
       ]
     }
   },

@@ -1,6 +1,6 @@
+import {GridsterComponentInterface} from './gridster.interface';
 import {GridsterItem} from './gridsterItem.interface';
 import {GridsterItemComponentInterface} from './gridsterItemComponent.interface';
-import {GridsterComponentInterface} from './gridster.interface';
 
 export type gridTypes = 'fit' | 'scrollVertical' | 'scrollHorizontal' | 'fixed' | 'verticalFixed' | 'horizontalFixed';
 export type displayGrids = 'always' | 'onDrag&Resize' | 'none';
@@ -40,6 +40,13 @@ export enum CompactType {
   CompactRightAndUp = 'compactRight&Up',
 }
 
+export enum DirTypes {
+  LTR = 'ltr',
+  RTL = 'rtl'
+}
+
+export type dirTypes = 'ltr' | 'rtl';
+
 export interface GridsterConfig {
   gridType?: gridTypes;
   fixedColWidth?: number;
@@ -49,6 +56,10 @@ export interface GridsterConfig {
   setGridSize?: boolean;
   compactType?: compactTypes;
   mobileBreakpoint?: number;
+  allowMultiLayer?: boolean;
+  defaultLayerIndex?: number;
+  maxLayerIndex?: number;
+  baseLayerIndex?: number;
   minCols?: number;
   maxCols?: number;
   minRows?: number;
@@ -106,6 +117,7 @@ export interface GridsterConfig {
   emptyCellDragMaxCols?: number;
   emptyCellDragMaxRows?: number;
   ignoreMarginInRow?: boolean;
+  dirType?: dirTypes;
   api?: {
     resize?: () => void,
     optionsChanged?: () => void,

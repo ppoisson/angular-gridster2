@@ -1,11 +1,12 @@
 import {Injectable, NgZone} from '@angular/core';
+import {GridsterComponentInterface} from './gridster.interface';
+import {DirTypes} from './gridsterConfig.interface';
+import {GridsterItemComponentInterface} from './gridsterItemComponent.interface';
+import {GridsterPush} from './gridsterPush.service';
+import {cancelScroll, scroll} from './gridsterScroll.service';
 
 import {GridsterSwap} from './gridsterSwap.service';
-import {cancelScroll, scroll} from './gridsterScroll.service';
-import {GridsterPush} from './gridsterPush.service';
 import {GridsterUtils} from './gridsterUtils.service';
-import {GridsterItemComponentInterface} from './gridsterItemComponent.interface';
-import {GridsterComponentInterface} from './gridster.interface';
 
 @Injectable()
 export class GridsterDraggable {
@@ -32,15 +33,15 @@ export class GridsterDraggable {
   dragStartFunction: (event: any) => void;
   dragFunction: (event: any) => void;
   dragStopFunction: (event: any) => void;
-  mousemove: Function;
-  mouseup: Function;
-  mouseleave: Function;
-  cancelOnBlur: Function;
-  touchmove: Function;
-  touchend: Function;
-  touchcancel: Function;
-  mousedown: Function;
-  touchstart: Function;
+  mousemove: () => void;
+  mouseup: () => void;
+  mouseleave: () => void;
+  cancelOnBlur: () => void;
+  touchmove: () => void;
+  touchend: () => void;
+  touchcancel: () => void;
+  mousedown: () => void;
+  touchstart: () => void;
   push: GridsterPush;
   swap: GridsterSwap;
   path: Array<{ x: number, y: number }>;
@@ -70,14 +71,8 @@ export class GridsterDraggable {
   }
 
   dragStart(e: any): void {
-    switch (e.which) {
-      case 1:
-        // left mouse button
-        break;
-      case 2:
-      case 3:
-        // right or middle mouse button
-        return;
+    if (e.which && e.which !== 1) {
+      return;
     }
 
     if (this.gridster.options.draggable && this.gridster.options.draggable.start) {
@@ -106,7 +101,11 @@ export class GridsterDraggable {
     this.top = this.gridsterItem.top - this.margin;
     this.width = this.gridsterItem.width;
     this.height = this.gridsterItem.height;
-    this.diffLeft = e.clientX + this.offsetLeft - this.margin - this.left;
+    if (this.gridster.$options.dirType === DirTypes.RTL) {
+      this.diffLeft = (e.clientX - this.gridster.el.scrollWidth + this.gridsterItem.left);
+    } else {
+      this.diffLeft = e.clientX + this.offsetLeft - this.margin - this.left;
+    }
     this.diffTop = e.clientY + this.offsetTop - this.margin - this.top;
     this.gridster.movingItem = this.gridsterItem.$item;
     this.gridster.previewStyle(true);
@@ -130,7 +129,12 @@ export class GridsterDraggable {
   }
 
   calculateItemPositionFromMousePosition(e: any): void {
-    this.left = e.clientX + this.offsetLeft - this.diffLeft;
+    if (this.gridster.$options.dirType === DirTypes.RTL) {
+      this.left = this.gridster.el.scrollWidth - e.clientX + this.diffLeft;
+    } else {
+      this.left = e.clientX + this.offsetLeft - this.diffLeft;
+    }
+
     this.top = e.clientY + this.offsetTop - this.diffTop;
     this.calculateItemPosition();
     this.lastMouse.clientX = e.clientX;

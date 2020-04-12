@@ -1,31 +1,31 @@
+/**
+ * Created by YISH on 2020/02/28.
+ */
 import {ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation} from '@angular/core';
-
-import {DisplayGrid, Draggable, GridsterConfig, GridsterItem, GridType, PushDirections, Resizable} from 'angular-gridster2';
-
-interface Safe extends GridsterConfig {
-  draggable: Draggable;
-  resizable: Resizable;
-  pushDirections: PushDirections;
-}
+import {DisplayGrid, GridsterConfig, GridsterItem, GridType} from 'angular-gridster2';
 
 @Component({
-  selector: 'app-push',
-  templateUrl: './push.component.html',
+  selector: 'app-swap',
+  templateUrl: './multi-layer.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class PushComponent implements OnInit {
-  options: Safe;
+export class MultiLayerComponent implements OnInit {
+  options: GridsterConfig;
   dashboard: Array<GridsterItem>;
 
+  // noinspection DuplicatedCode
   ngOnInit() {
     this.options = {
       gridType: GridType.Fit,
       displayGrid: DisplayGrid.Always,
-      pushItems: true,
-      pushDirections: {north: true, east: true, south: true, west: true},
-      pushResizeItems: false,
-      swap: false,
+      pushItems: false,
+      swap: true,
+      allowMultiLayer: true,
+      defaultLayerIndex: 1,
+      baseLayerIndex: 2,
+      maxLayerIndex: 2,
+      swapWhileDragging: false,
       draggable: {
         enabled: true
       },
@@ -35,7 +35,7 @@ export class PushComponent implements OnInit {
     };
 
     this.dashboard = [
-      {cols: 2, rows: 1, y: 0, x: 0},
+      {cols: 2, rows: 1, y: 0, x: 0, layerIndex: 2},
       {cols: 2, rows: 2, y: 0, x: 2},
       {cols: 1, rows: 1, y: 0, x: 4},
       {cols: 3, rows: 2, y: 1, x: 4},
@@ -54,14 +54,28 @@ export class PushComponent implements OnInit {
       this.options.api.optionsChanged();
     }
   }
+  bringToFront(item: GridsterItem) {
+    if (item.layerIndex === undefined) {
+      item.layerIndex = 2;
+    } else {
+      item.layerIndex += 1;
+    }
+  }
+  sendToBack(item: GridsterItem) {
+    if (item.layerIndex === undefined) {
+      item.layerIndex = 0;
+    } else {
+      item.layerIndex -= 1;
+    }
+  }
 
-  removeItem($event, item) {
+  removeItem($event, item: GridsterItem) {
     $event.preventDefault();
     $event.stopPropagation();
     this.dashboard.splice(this.dashboard.indexOf(item), 1);
   }
 
   addItem() {
-    this.dashboard.push({x: 0, y: 0, cols: 1, rows: 1});
+    this.dashboard.push({x: 0, y: 0, cols: 2, rows: 1});
   }
 }

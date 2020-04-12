@@ -1,12 +1,13 @@
 import {Injectable, NgZone} from '@angular/core';
+import {GridsterComponentInterface} from './gridster.interface';
+import {DirTypes} from './gridsterConfig.interface';
+import {GridsterItemComponentInterface} from './gridsterItemComponent.interface';
+import {GridsterPush} from './gridsterPush.service';
+import {GridsterPushResize} from './gridsterPushResize.service';
+import {GridsterResizeEventType} from './gridsterResizeEventType.interface';
 
 import {cancelScroll, scroll} from './gridsterScroll.service';
-import {GridsterResizeEventType} from './gridsterResizeEventType.interface';
-import {GridsterPush} from './gridsterPush.service';
 import {GridsterUtils} from './gridsterUtils.service';
-import {GridsterPushResize} from './gridsterPushResize.service';
-import {GridsterItemComponentInterface} from './gridsterItemComponent.interface';
-import {GridsterComponentInterface} from './gridster.interface';
 
 @Injectable()
 export class GridsterResizable {
@@ -18,17 +19,17 @@ export class GridsterResizable {
   };
   itemBackup: Array<number>;
   resizeEventScrollType: GridsterResizeEventType;
-  directionFunction: Function;
+  directionFunction: (e: any) => void;
   dragFunction: (event: any) => void;
   dragStopFunction: (event: any) => void;
   resizeEnabled: boolean;
-  mousemove: Function;
-  mouseup: Function;
-  mouseleave: Function;
-  cancelOnBlur: Function;
-  touchmove: Function;
-  touchend: Function;
-  touchcancel: Function;
+  mousemove: () => void;
+  mouseup: () => void;
+  mouseleave: () => void;
+  cancelOnBlur: () => void;
+  touchmove: () => void;
+  touchend: () => void;
+  touchcancel: () => void;
   push: GridsterPush;
   pushResize: GridsterPushResize;
   minHeight: number;
@@ -68,14 +69,8 @@ export class GridsterResizable {
   }
 
   dragStart(e: any): void {
-    switch (e.which) {
-      case 1:
-        // left mouse button
-        break;
-      case 2:
-      case 3:
-        // right or middle mouse button
-        return;
+    if (e.which && e.which !== 1) {
+      return;
     }
     if (this.gridster.options.resizable && this.gridster.options.resizable.start) {
       this.gridster.options.resizable.start(this.gridsterItem.item, this.gridsterItem, e);
@@ -125,30 +120,64 @@ export class GridsterResizable {
       this.resizeEventScrollType.n = true;
       this.directionFunction = this.handleN;
     } else if (e.target.hasAttribute('class') && e.target.getAttribute('class').split(' ').indexOf('handle-w') > -1) {
-      this.resizeEventScrollType.w = true;
-      this.directionFunction = this.handleW;
+      if (this.gridster.$options.dirType === DirTypes.RTL) {
+        this.resizeEventScrollType.e = true;
+        this.directionFunction = this.handleE;
+      } else {
+        this.resizeEventScrollType.w = true;
+        this.directionFunction = this.handleW;
+      }
     } else if (e.target.hasAttribute('class') && e.target.getAttribute('class').split(' ').indexOf('handle-s') > -1) {
       this.resizeEventScrollType.s = true;
       this.directionFunction = this.handleS;
     } else if (e.target.hasAttribute('class') && e.target.getAttribute('class').split(' ').indexOf('handle-e') > -1) {
-      this.resizeEventScrollType.e = true;
-      this.directionFunction = this.handleE;
+      if (this.gridster.$options.dirType === DirTypes.RTL) {
+        this.resizeEventScrollType.w = true;
+        this.directionFunction = this.handleW;
+      } else {
+        this.resizeEventScrollType.e = true;
+        this.directionFunction = this.handleE;
+      }
     } else if (e.target.hasAttribute('class') && e.target.getAttribute('class').split(' ').indexOf('handle-nw') > -1) {
-      this.resizeEventScrollType.n = true;
-      this.resizeEventScrollType.w = true;
-      this.directionFunction = this.handleNW;
+      if (this.gridster.$options.dirType === DirTypes.RTL) {
+        this.resizeEventScrollType.n = true;
+        this.resizeEventScrollType.e = true;
+        this.directionFunction = this.handleNE;
+      } else {
+        this.resizeEventScrollType.n = true;
+        this.resizeEventScrollType.w = true;
+        this.directionFunction = this.handleNW;
+      }
     } else if (e.target.hasAttribute('class') && e.target.getAttribute('class').split(' ').indexOf('handle-ne') > -1) {
-      this.resizeEventScrollType.n = true;
-      this.resizeEventScrollType.e = true;
-      this.directionFunction = this.handleNE;
+      if (this.gridster.$options.dirType === DirTypes.RTL) {
+        this.resizeEventScrollType.n = true;
+        this.resizeEventScrollType.w = true;
+        this.directionFunction = this.handleNW;
+      } else {
+        this.resizeEventScrollType.n = true;
+        this.resizeEventScrollType.e = true;
+        this.directionFunction = this.handleNE;
+      }
     } else if (e.target.hasAttribute('class') && e.target.getAttribute('class').split(' ').indexOf('handle-sw') > -1) {
-      this.resizeEventScrollType.s = true;
-      this.resizeEventScrollType.w = true;
-      this.directionFunction = this.handleSW;
+      if (this.gridster.$options.dirType === DirTypes.RTL) {
+        this.resizeEventScrollType.s = true;
+        this.resizeEventScrollType.e = true;
+        this.directionFunction = this.handleSE;
+      } else {
+        this.resizeEventScrollType.s = true;
+        this.resizeEventScrollType.w = true;
+        this.directionFunction = this.handleSW;
+      }
     } else if (e.target.hasAttribute('class') && e.target.getAttribute('class').split(' ').indexOf('handle-se') > -1) {
-      this.resizeEventScrollType.s = true;
-      this.resizeEventScrollType.e = true;
-      this.directionFunction = this.handleSE;
+      if (this.gridster.$options.dirType === DirTypes.RTL) {
+        this.resizeEventScrollType.s = true;
+        this.resizeEventScrollType.w = true;
+        this.directionFunction = this.handleSW;
+      } else {
+        this.resizeEventScrollType.s = true;
+        this.resizeEventScrollType.e = true;
+        this.directionFunction = this.handleSE;
+      }
     }
   }
 

@@ -1,6 +1,6 @@
-import {compactTypes, displayGrids, gridTypes} from './gridsterConfig.interface';
-import {GridsterItem} from './gridsterItem.interface';
 import {GridsterComponentInterface} from './gridster.interface';
+import {compactTypes, dirTypes, displayGrids, gridTypes} from './gridsterConfig.interface';
+import {GridsterItem} from './gridsterItem.interface';
 
 export interface GridsterConfigS {
   gridType: gridTypes;
@@ -11,6 +11,10 @@ export interface GridsterConfigS {
   setGridSize: boolean;
   compactType: compactTypes;
   mobileBreakpoint: number;
+  allowMultiLayer: boolean;
+  defaultLayerIndex: number;
+  maxLayerIndex: number;
+  baseLayerIndex: number;
   minCols: number;
   maxCols: number;
   minRows: number;
@@ -56,6 +60,7 @@ export interface GridsterConfigS {
   emptyCellDragMaxCols: number;
   emptyCellDragMaxRows: number;
   ignoreMarginInRow: boolean;
+  dirType: dirTypes;
   api: {
     resize: () => void,
     optionsChanged: () => void,
